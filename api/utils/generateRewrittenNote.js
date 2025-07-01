@@ -1,16 +1,26 @@
 const axios = require("axios");
 
 const generateRewrittenNote = async (fullContext, newInput) => {
-  const prompt = `
-    You are a helpful assistant that rewrites a anime story in a well -written way.
-    Here is the story so far which is a mix of different arcs, characters, events and author opinions:
-    "${fullContext}"
+  // const prompt = `
+  // You are an AI writing assistant. Your job is to improve anime story snippets **without changing the meaning**.
 
-    Here is the new input that needs to be added to the story:
-    "${newInput}"
+  // You are NOT allowed to:
+  // - Add new characters
+  // - Change names, relationships, settings, or timeline
+  // - Invent events or flashbacks
+  // - Replace the author's intent or tone
 
-    Please rewrite ONLY the new input to make it fit naturally and emotionally into the existing story.Do NOT change setting, timeline, or invent new characters or background. Just polish the new input so it flows well with the previous story. Keep it short and in the same tone. Return ONLY the rewritten version of the new input suitable for an anime narrative.
-    `;
+  // You must ONLY rewrite the NEW INPUT to flow better with the existing story.
+  // Keep it short, emotional, and natural.
+
+  // Previous story context:
+  // "${fullContext}"
+
+  // New input:
+  // "${newInput}"
+
+  // Your output should be ONLY the rewritten version of the new input, well-polished but faithful to the original.
+  // `;
 
   try {
     const response = await axios.post(
@@ -20,12 +30,37 @@ const generateRewrittenNote = async (fullContext, newInput) => {
         messages: [
           {
             role: "system",
-            content:
-              "you are a helpful assistant that rewrites the raw anime story in a well-written way.",
+            content: `You are an AI writing assistant. 
+        Your only job is to rewrite the NEW INPUT so it flows naturally with the existing anime story.
+        
+        🛑 You must NOT:
+        - Invent new characters
+        - Change names, relationships, or timeline
+        - Add backstory or setting
+        - Make it longer than necessary
+        
+        ✅ You MUST:
+        - Keep the tone emotional and natural
+        - Keep context consistent with the previous story
+        - Only return the rewritten version of the new input
+        
+        Do not summarize, do not generate an entire scene, just clean up the new input.`,
           },
-          { role: "user", content: prompt },
+          {
+            role: "user",
+            content: `
+        Here is the previous story context:
+        "${fullContext}"
+        
+        Here is the new input:
+        "${newInput}"
+        
+        Rewrite ONLY the new input so that it fits smoothly into the existing story.
+        Return only the polished version of the new input.`,
+          },
         ],
-        temperature: 0.75,
+
+        temperature: 0.7,
       },
       {
         headers: {

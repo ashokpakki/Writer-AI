@@ -18,7 +18,7 @@ const createNote = async (req, res) => {
 
     await note.save();
 
-    const rewritten = await rewriteContent(content);
+    const rewritten = await generateRewrittenNote(content);
     note.rewritten = rewritten;
     await note.save();
 
@@ -41,6 +41,16 @@ const getNotes = async (req, res) => {
   }
 };
 
+const clearAllNotes = async (req, res) => {
+  try {
+    await Note.deleteMany({ user: req.user.id });
+    res.status(200).json({ message: "All notes deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to delete notes" });
+  }
+};
+
 const createNoteWithAI = async (req, res) => {
   try {
     const { content } = req.body;
@@ -49,7 +59,13 @@ const createNoteWithAI = async (req, res) => {
     const previousNotes = await Note.find({ user: userId }).sort({
       createdAt: 1,
     });
-    const context = previousNotes.map((note) => note.content).join("\n");
+
+    let context = previousNotes.map((note) => note.content).join("\n");
+
+    if (!context) {
+      context =
+        "This is a new anime story. Track the plot, arcs, characters and emotions from now on.";
+    }
 
     const rewritten = await generateRewrittenNote(context, content);
 
@@ -74,4 +90,5 @@ module.exports = {
   createNote,
   getNotes,
   createNoteWithAI,
+  clearAllNotes,
 };

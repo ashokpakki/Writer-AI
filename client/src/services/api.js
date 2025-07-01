@@ -12,9 +12,10 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export const createNote = (content) => API.post("/notes/ai", { content });
+export const createNote = (content) => API.post("/notes", { content });
 export const getNotes = () => API.get("/notes");
 export const register = (data) => API.post("/auth/register", data);
 export const login = (data) => API.post("/auth/login", data);
+export const clearNotes = () => API.delete("/notes/clear");
 
 export default API;
