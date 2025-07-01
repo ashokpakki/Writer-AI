@@ -32,29 +32,6 @@ Writer Studio AI is a full-stack web application that helps you draft emotionall
 
 ---
 
-## 📁 Project Structure
-
-writer-ai-app/
-│
-├── client/ # React frontend
-│ ├── src/
-│ │ ├── pages/
-│ │ ├── components/
-│ │ ├── services/
-│ │ └── App.jsx
-│ └── package.json
-│
-├── api/ # Express backend
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ └── utils/
-│
-├── .gitignore
-├── package.json
-└── README.md
-
-
 📌 Future Ideas
 Versioned story history
 
