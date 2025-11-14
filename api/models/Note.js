@@ -13,6 +13,7 @@ const noteSchema = new mongoose.Schema(
     },
     rewritten: {
       type: String,
+      required: true,
     },
   },
   { timestamps: true }

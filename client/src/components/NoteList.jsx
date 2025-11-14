@@ -10,7 +10,7 @@ const StoryView = () => {
     const fetchNotes = async () => {
       try {
         const response = await getNotes();
-        setNotes(response.data.reverse()); // newest at bottom
+        setNotes(response.data.reverse());
       } catch (err) {
         console.error("Failed to fetch story notes:", err);
       }

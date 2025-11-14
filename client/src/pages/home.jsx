@@ -1,6 +1,5 @@
 import {
   Box,
-  Grid,
   Typography,
   Card,
   CardContent,
@@ -8,21 +7,32 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NoteOutput from "../components/NoteOutput";
 import AIStoryPanel from "../components/AIStoryPanel";
-import { createNote, clearNotes } from "../services/api";
+import { getNotes, createNote, clearNotes } from "../services/api";
 
 const Home = () => {
   const [input, setInput] = useState("");
   const [rewritten, setRewritten] = useState("");
   const [notes, setNotes] = useState([]);
 
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const res = await getNotes();
+        setNotes(res.data);
+      } catch (err) {
+        console.error("Failed to fetch notes:", err);
+      }
+    };
+    fetchNotes();
+  }, []);
   const handleSubmit = async () => {
     if (!input.trim()) return;
     try {
       const res = await createNote(input);
-      setRewritten(res.data.note.rewritten);
+      setRewritten(res.data.note.rewritten || "AI Failed");
       setNotes((prev) => [...prev, res.data.note]);
       setInput("");
     } catch (err) {
@@ -68,62 +78,54 @@ const Home = () => {
           bgcolor: "background.paper",
         }}
       >
-        <Grid container spacing={2}>
-          {/* LEFT: RAW INPUT */}
-          <Grid item xs={20} md={10}>
-            <Card
-              elevation={10}
-              sx={{
-                width: "100%",
-                height: "90%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h5" gutterBottom>
-                  Story Draft
-                </Typography>
+        <Box sx={{ display: "flex", gap: 2, px: 2, flexWrap: "wrap" }}>
+          {/* Left Side - Input */}
+          <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <Card sx={{ flexGrow: 1 }}>
+              <CardContent
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <Typography variant="h6">Raw Input</Typography>
                 <TextField
                   multiline
-                  rows={20}
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Start typing your story..."
+                  minRows={8}
+                  maxRows={14}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  fullWidth
+                  sx={{ mt: 2, flexGrow: 1, overflowY: "auto" }}
                 />
                 <Button
                   variant="contained"
-                  sx={{ mt: 4 }}
-                  fullWidth
                   onClick={handleSubmit}
+                  sx={{ mt: 2 }}
                 >
                   Submit
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          {/* RIGHT: OUTPUTS */}
-          <Grid item xs={20} md={10}>
-            <Box
-              elevation={8}
-              sx={{
-                height: "90%",
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
+          {/* Right Side - Outputs */}
+          <Box
+            sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <NoteOutput rewritten={rewritten} />
+            <AIStoryPanel notes={notes} />
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleClear}
+              sx={{ alignSelf: "flex-start" }}
             >
-              <NoteOutput rewritten={rewritten} />
-              <AIStoryPanel notes={notes} />
-              <Button variant="outlined" color="error" onClick={handleClear}>
-                Clear All Notes
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
+              Clear All Notes
+            </Button>
+          </Box>
+        </Box>
       </Paper>
     </Box>
   );
